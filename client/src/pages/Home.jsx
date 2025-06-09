@@ -14,7 +14,7 @@ const Home = () => {
         <section className="container mx-auto  ">
           <div className="flex justify-center items-center gap-8 flex-col mt-72 relative">
             <h1 className="font-bold text-7xl">Connect </h1>
-            <button className="py-4 px-6 bg-[#222222] rounded-full text-white text-center">
+            <button className="py-4 px-6 bg-[#222222] rounded-full text-white text-center cursor-pointer hover:opacity-80 transition-opacity duration-300 ease-in-out">
               Create Account
             </button>
           </div>

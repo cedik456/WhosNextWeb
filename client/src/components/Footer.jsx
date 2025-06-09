@@ -1,4 +1,11 @@
 import React from "react";
+import {
+  FaInstagram,
+  FaTiktok,
+  FaYoutube,
+  FaTwitter,
+  FaFacebook,
+} from "react-icons/fa";
 
 const Footer = () => {
   return (
@@ -22,7 +29,23 @@ const Footer = () => {
         </div>
         <div>
           <h1 className="text-lg font-bold">Socials</h1>
-          <ul></ul>
+          <ul className="flex gap-2">
+            <li>
+              <FaInstagram size={24} color="#000" />
+            </li>
+            <li>
+              <FaTiktok size={24} color="#000" />
+            </li>
+            <li>
+              <FaYoutube size={24} color="#000" />
+            </li>
+            <li>
+              <FaTwitter size={24} color="#000" />
+            </li>
+            <li>
+              <FaFacebook size={24} color="#000" />
+            </li>
+          </ul>
         </div>
         <div>
           <ul>
