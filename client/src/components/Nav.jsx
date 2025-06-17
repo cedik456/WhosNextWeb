@@ -14,7 +14,7 @@ const loginSchema = z.object({
 });
 
 const Nav = () => {
-  const { login } = useAuth();
+  const { login, logout, user } = useAuth();
   const navigate = useNavigate();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -53,6 +53,10 @@ const Nav = () => {
     }
   };
 
+  const handleLogout = async () => {
+    await logout();
+  };
+
   return (
     <>
       <nav className="w-full bg-[#F2F2F2]">
@@ -79,12 +83,23 @@ const Nav = () => {
           </ul>
           <div className="flex gap-6">
             <button className="text-sm">Language</button>
-            <button
-              onClick={handleLoginClick}
-              className="bg-[#222222] py-2 px-8 rounded-full text-sm text-white w-full cursor-pointer hover:opacity-80 transition-opacity duration-300 ease-in-out"
-            >
-              Login
-            </button>
+
+            {user ? (
+              <div
+                onClick={handleLogout}
+                className="w-10 h-10 rounded-full bg-gray-300 cursor-pointer hover:opacity-80 transition-opacity duration-300 ease-in-out flex items-center justify-center"
+                title="Logout"
+              >
+                <span className="text-sm text-black font-bold">C</span>
+              </div>
+            ) : (
+              <button
+                onClick={handleLoginClick}
+                className="bg-[#222222] py-2 px-8 rounded-full text-sm text-white w-full cursor-pointer hover:opacity-80 transition-opacity duration-300 ease-in-out"
+              >
+                Login
+              </button>
+            )}
           </div>
         </div>
       </nav>
@@ -117,15 +132,22 @@ const Nav = () => {
           >
             Login
           </button>
-          {(errors.email || errors.password || message) && (
-            <p className="mb-2 text-center text-xs text-red-500">
-              {errors.email?.message || errors.password?.message || message}
-            </p>
-          )}
 
-          <div className="flex justify-center">
+          <div className="flex justify-center mb-2">
             <p className="underline text-sm">Trouble Logging In?</p>
           </div>
+          <p
+            className={`text-center text-xs mb-2 h-3 transition-opacity duration-300 ${
+              errors.email || errors.password || message
+                ? "opacity-100 visible text-red-400"
+                : "opacity-0 invisible"
+            }`}
+          >
+            {errors.email?.message ||
+              errors.password?.message ||
+              message ||
+              "Placeholder"}
+          </p>
         </form>
       </LoginModal>
     </>

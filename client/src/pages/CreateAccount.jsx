@@ -9,7 +9,9 @@ import { zodResolver } from "@hookform/resolvers/zod";
 const registerSchema = z.object({
   name: z.string().min(2, { message: "Name must be at least 2 characters" }),
   email: z.string().email({ message: "Invalid email address" }),
-  password: z.string().min(8, { message: "Invalid email address" }),
+  password: z
+    .string()
+    .min(8, { message: "Password must be at least 8 characters " }),
 });
 
 const CreateAccount = () => {
@@ -57,34 +59,46 @@ const CreateAccount = () => {
             <input
               type="text"
               {...register("name")}
-              className="border rounded-2xl w-full px-3 py-2"
+              className="border rounded-2xl w-full px-3 py-2 mb-1"
               placeholder="Enter your name"
             />
-            {errors.name && (
-              <p className="text-red-500 text-xs">{errors.name.message}</p>
-            )}
+            <p
+              className={`text-xs h-2  ${
+                errors.name ? "text-red-500 visible" : "invisible"
+              }`}
+            >
+              {errors.name?.message || "Placeholder"}
+            </p>
           </div>
           <div className="mb-4">
             <input
               type="email"
               {...register("email")}
-              className="border rounded-2xl w-full px-3 py-2"
+              className="border rounded-2xl w-full px-3 py-2 mb-1"
               placeholder="Enter your email"
             />
-            {errors.email && (
-              <p className="text-red-500 text-xs">{errors.email.message}</p>
-            )}
+            <p
+              className={`text-xs h-2  ${
+                errors.email ? "text-red-500 visible" : "invisible"
+              }`}
+            >
+              {errors.email?.message || "Placeholder"}
+            </p>
           </div>
           <div className="mb-4">
             <input
               {...register("password")}
               type="password"
-              className="border rounded-2xl w-full px-3 py-2"
+              className="border rounded-2xl w-full px-3 py-2 mb-1 "
               placeholder="Enter your password"
             />
-            {errors.password && (
-              <p className="text-red-500 text-xs">{errors.password.message}</p>
-            )}
+            <p
+              className={`text-xs h-2 ${
+                errors.password ? "text-red-500 visible" : "invisible"
+              }`}
+            >
+              {errors.password?.message || "Placeholder"}
+            </p>
           </div>
           <button
             type="submit"
@@ -92,11 +106,6 @@ const CreateAccount = () => {
           >
             Register
           </button>
-          {/* {(errors.email || errors.password || message) && (
-            <p className="mb-2 text-center text-xs text-red-500">
-              {errors.email?.message || errors.password?.message || message}
-            </p>
-          )} */}
 
           <div className="flex justify-center">
             <p className="text-sm">
