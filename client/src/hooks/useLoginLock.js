@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 
-export const useLoginLock = (maxAttempts = 5, lockDuration = 2 * 60 * 1000) => {
+export const useLoginLock = (maxAttempts = 5, lockDuration = 2 * 10 * 1000) => {
   const [attempts, setAttempts] = useState(0);
   const [isLocked, setIsLocked] = useState(false);
   const [lockCountdown, setLockCountdown] = useState(0);
@@ -27,12 +27,14 @@ export const useLoginLock = (maxAttempts = 5, lockDuration = 2 * 60 * 1000) => {
     if (wasSuccessful) {
       setAttempts(0);
     } else {
-      const newAttempts = attempts + 1;
-      setAttempts(newAttempts);
-      if (newAttempts >= 3 && newAttempts <= maxAttempts) {
-        setIsLocked(true);
-        lockUntilRef.current = Date.now() + lockDuration;
-      }
+      setAttempts((prev) => {
+        const updated = prev + 1;
+        if (updated >= 3 && updated <= maxAttempts) {
+          setIsLocked(true);
+          lockUntilRef.current = Date.now() + lockDuration;
+        }
+        return updated;
+      });
     }
   };
 

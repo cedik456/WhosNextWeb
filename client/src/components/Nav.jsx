@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import LoginModal from "./LoginModal";
 import { useAuth } from "../contexts/AuthContext";
@@ -14,7 +14,15 @@ const Nav = () => {
   const { isLocked, lockCountdown, reportLoginResult } = useLoginLock();
   const [message, setMessage] = useState("");
 
+  useEffect(() => {
+    if (isLocked) {
+      console.log("Lock triggered by useEffect");
+      setMessage("Too many login attempts. Try again in 2 minutes.");
+    }
+  }, [isLocked]);
+
   const handleLoginClick = () => {
+    // setMessage("");
     setIsModalOpen(true);
   };
 
@@ -25,13 +33,18 @@ const Nav = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (isLocked) {
-      setMessage("Too many login attempts. Try again in 2 minutes.");
+    if (!email || !password) {
+      setMessage("Email and password required");
       return;
     }
 
-    const result = await login(email, password); 
+    const emailRegex = /\S+@\S+\.\S+/;
+    if (!emailRegex.test(email)) {
+      setMessage("Please enter a valid email address.");
+      return;
+    }
 
+    const result = await login(email, password);
 
     if (result.success) {
       setMessage("");
@@ -41,24 +54,31 @@ const Nav = () => {
       setMessage("Wrong username or password.");
       reportLoginResult(false);
     }
-    // TO BE FIXED
-     if (isLocked) {
-      setMessage("Too many login attempts. Try again in 2 minutes.");
-      return;
-    }
   };
 
   return (
     <>
       <nav className="w-full bg-[#F2F2F2]">
         <div className="container flex items-center justify-between mx-auto p-8">
-          <Link className="text-3xl font-bold" to="/">Who's Next</Link>
+          <Link className="text-3xl font-bold" to="/">
+            Who's Next
+          </Link>
           <ul className="flex gap-6">
-            <li><Link to="/">Home</Link></li>
-            <li><Link to="/">Learn</Link></li>
-            <li><Link to="/">Safety</Link></li>
-            <li><Link to="/">Support</Link></li>
-            <li><Link to="/">Download</Link></li>
+            <li>
+              <Link to="/">Home</Link>
+            </li>
+            <li>
+              <Link to="/">Learn</Link>
+            </li>
+            <li>
+              <Link to="/">Safety</Link>
+            </li>
+            <li>
+              <Link to="/">Support</Link>
+            </li>
+            <li>
+              <Link to="/">Download</Link>
+            </li>
           </ul>
           <div className="flex gap-6">
             <button className="text-sm">Language</button>
@@ -74,8 +94,7 @@ const Nav = () => {
 
       <LoginModal isOpen={isModalOpen} onClose={handleCloseModal}>
         <h2 className="text-2xl font-bold mb-4">Login</h2>
-        {message && (
-          <p className="text-red-500 text-sm mb-4 text-center">{message}</p>)}
+
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
             <label className="block mb-2 text-sm">Email</label>
@@ -110,6 +129,13 @@ const Nav = () => {
           >
             {isLocked ? `Locked (${lockCountdown}s)` : "Login"}
           </button>
+          <p
+            className={`text-red-500 text-sm mb-2 text-center transition-opacity duration-500 ease-in-out ${
+              message ? "opacity-100 visible " : "opacity-0 invisible"
+            }`}
+          >
+            {message || "placeholder"}
+          </p>
 
           <div className="flex justify-center">
             <p className="underline text-sm">Trouble Logging In?</p>
