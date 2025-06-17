@@ -3,53 +3,63 @@ import { Link, useNavigate } from "react-router-dom";
 import LoginModal from "./LoginModal";
 import { useAuth } from "../contexts/AuthContext";
 import { useLoginLock } from "../hooks/useLoginLock";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+
+const loginSchema = z.object({
+  email: z.string().email({ message: "Invalid email address" }),
+  password: z
+    .string()
+    .min(8, { message: "Password must be at least 8 characters" })
+    .regex(/[A-Z]/, { message: "Must include an uppercase letter" })
+    .regex(/[a-z]/, { message: "Must include a lowercase letter" })
+    .regex(/[0-9]/, { message: "Must include a number" })
+    .regex(/[!@#$%^&*]/, { message: "Must include a special character" }),
+});
 
 const Nav = () => {
   const { login } = useAuth();
   const navigate = useNavigate();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
   const { isLocked, lockCountdown, reportLoginResult } = useLoginLock();
   const [message, setMessage] = useState("");
 
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    reset,
+  } = useForm({
+    resolver: zodResolver(loginSchema),
+  });
+
   useEffect(() => {
     if (isLocked) {
-      console.log("Lock triggered by useEffect");
       setMessage("Too many login attempts. Try again in 2 minutes.");
     }
   }, [isLocked]);
 
   const handleLoginClick = () => {
-    // setMessage("");
+    setMessage("");
     setIsModalOpen(true);
   };
 
   const handleCloseModal = () => {
     setIsModalOpen(false);
+    reset();
+    setMessage("");
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    if (!email || !password) {
-      setMessage("Email and password required");
-      return;
-    }
-
-    const emailRegex = /\S+@\S+\.\S+/;
-    if (!emailRegex.test(email)) {
-      setMessage("Please enter a valid email address.");
-      return;
-    }
-
-    const result = await login(email, password);
+  const onSubmit = async (data) => {
+    const result = await login(data.email, data.password);
 
     if (result.success) {
       setMessage("");
       navigate("/swipeView");
       setIsModalOpen(false);
+      reset();
     } else {
       setMessage("Wrong username or password.");
       reportLoginResult(false);
@@ -95,14 +105,13 @@ const Nav = () => {
       <LoginModal isOpen={isModalOpen} onClose={handleCloseModal}>
         <h2 className="text-2xl font-bold mb-4">Login</h2>
 
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit(onSubmit)}>
           <div className="mb-4">
             <label className="block mb-2 text-sm">Email</label>
             <input
               type="email"
-              value={email}
+              {...register("email")}
               disabled={isLocked}
-              onChange={(e) => setEmail(e.target.value)}
               className="border rounded-2xl w-full px-3 py-2"
               placeholder="Enter your email"
               required
@@ -112,9 +121,8 @@ const Nav = () => {
             <label className="block mb-2 text-sm">Password</label>
             <input
               type="password"
-              value={password}
+              {...register("password")}
               disabled={isLocked}
-              onChange={(e) => setPassword(e.target.value)}
               className="border rounded-2xl w-full px-3 py-2"
               placeholder="Enter your password"
               required
@@ -129,13 +137,13 @@ const Nav = () => {
           >
             {isLocked ? `Locked (${lockCountdown}s)` : "Login"}
           </button>
-          <p
-            className={`text-red-500 text-sm mb-2 text-center transition-opacity duration-500 ease-in-out ${
-              message ? "opacity-100 visible " : "opacity-0 invisible"
-            }`}
-          >
-            {message || "placeholder"}
-          </p>
+          {(errors.email || errors.password || message) && (
+            <div className="mb-2 text-center text-sm text-red-500 space-y-1">
+              {errors.email && <p>{errors.email.message}</p>}
+              {errors.password && <p>{errors.password.message}</p>}
+              {message && <p>{message}</p>}
+            </div>
+          )}
 
           <div className="flex justify-center">
             <p className="underline text-sm">Trouble Logging In?</p>
