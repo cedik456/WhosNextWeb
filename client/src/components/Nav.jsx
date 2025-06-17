@@ -1,8 +1,7 @@
-import React, { useEffect, useState } from "react";
+import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import LoginModal from "./LoginModal";
 import { useAuth } from "../contexts/AuthContext";
-import { useLoginLock } from "../hooks/useLoginLock";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -11,11 +10,7 @@ const loginSchema = z.object({
   email: z.string().email({ message: "Invalid email address" }),
   password: z
     .string()
-    .min(8, { message: "Password must be at least 8 characters" })
-    .regex(/[A-Z]/, { message: "Must include an uppercase letter" })
-    .regex(/[a-z]/, { message: "Must include a lowercase letter" })
-    .regex(/[0-9]/, { message: "Must include a number" })
-    .regex(/[!@#$%^&*]/, { message: "Must include a special character" }),
+    .min(8, { message: "Password must be at least 8 characters" }),
 });
 
 const Nav = () => {
@@ -23,7 +18,6 @@ const Nav = () => {
   const navigate = useNavigate();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const { isLocked, lockCountdown, reportLoginResult } = useLoginLock();
   const [message, setMessage] = useState("");
 
   const {
@@ -34,12 +28,6 @@ const Nav = () => {
   } = useForm({
     resolver: zodResolver(loginSchema),
   });
-
-  useEffect(() => {
-    if (isLocked) {
-      setMessage("Too many login attempts. Try again in 2 minutes.");
-    }
-  }, [isLocked]);
 
   const handleLoginClick = () => {
     setMessage("");
@@ -61,8 +49,7 @@ const Nav = () => {
       setIsModalOpen(false);
       reset();
     } else {
-      setMessage("Wrong username or password.");
-      reportLoginResult(false);
+      setMessage(result.message);
     }
   };
 
@@ -111,10 +98,8 @@ const Nav = () => {
             <input
               type="email"
               {...register("email")}
-              disabled={isLocked}
               className="border rounded-2xl w-full px-3 py-2"
               placeholder="Enter your email"
-              required
             />
           </div>
           <div className="mb-4">
@@ -122,27 +107,20 @@ const Nav = () => {
             <input
               type="password"
               {...register("password")}
-              disabled={isLocked}
               className="border rounded-2xl w-full px-3 py-2"
               placeholder="Enter your password"
-              required
             />
           </div>
           <button
             type="submit"
-            disabled={isLocked}
-            className={`bg-[#222222] py-2 px-4 rounded-2xl text-white w-full mb-4 cursor-pointer transition-opacity duration-300 ease-in-out ${
-              isLocked ? "opacity-50 cursor-not-allowed" : "hover:opacity-80"
-            }`}
+            className={`bg-[#222222] py-2 px-4 rounded-2xl text-white w-full mb-4 cursor-pointer transition-opacity duration-300 ease-in-out`}
           >
-            {isLocked ? `Locked (${lockCountdown}s)` : "Login"}
+            Login
           </button>
           {(errors.email || errors.password || message) && (
-            <div className="mb-2 text-center text-sm text-red-500 space-y-1">
-              {errors.email && <p>{errors.email.message}</p>}
-              {errors.password && <p>{errors.password.message}</p>}
-              {message && <p>{message}</p>}
-            </div>
+            <p className="mb-2 text-center text-xs text-red-500">
+              {errors.email?.message || errors.password?.message || message}
+            </p>
           )}
 
           <div className="flex justify-center">

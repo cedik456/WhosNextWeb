@@ -24,6 +24,8 @@ const SwipeView = () => {
           Logout
         </button>
       </div>
+
+      <p>Welcome {user?.name}</p>
     </div>
   );
 };

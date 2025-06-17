@@ -7,10 +7,11 @@ const { register, login } = require("../controllers/authController");
 const validate = require("../middlewares/validate");
 
 const { registerSchema, loginSchema } = require("../validators/authValidators");
+const loginRateLimiter = require("../middlewares/rateLimiter");
 
 router.post("/register", validate(registerSchema), register);
 
-router.post("/login", validate(loginSchema), login);
+router.post("/login", loginRateLimiter, validate(loginSchema), login);
 
 router.get("/", (req, res) => {
   res.send("This is the auth ");

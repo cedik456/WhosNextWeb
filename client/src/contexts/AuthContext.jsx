@@ -15,8 +15,33 @@ export function AuthProvider({ children }) {
       const { data } = await api.post("/auth/login", { email, password });
       const token = data.token;
 
+      const userData = { email, token };
       saveToken(token);
-      setUser({ email, token });
+      localStorage.setItem("user", JSON.stringify(userData));
+      setUser(userData);
+
+      return { success: true };
+    } catch (error) {
+      return {
+        success: false,
+        message: error.response?.data?.message || error.message,
+      };
+    }
+  }
+
+  async function signup(name, email, password) {
+    try {
+      const { data } = await api.post("/auth/register", {
+        name,
+        email,
+        password,
+      });
+      const token = data.token;
+
+      const userData = { name, email, token };
+      saveToken(token);
+      localStorage.setItem("user", JSON.stringify(userData));
+      setUser(userData);
 
       return { success: true };
     } catch (error) {
@@ -34,7 +59,7 @@ export function AuthProvider({ children }) {
   }
 
   return (
-    <AuthContext.Provider value={{ user, login, logout }}>
+    <AuthContext.Provider value={{ user, login, logout, signup }}>
       {children}
     </AuthContext.Provider>
   );
