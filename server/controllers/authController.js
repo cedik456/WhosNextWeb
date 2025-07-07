@@ -3,11 +3,18 @@ const jwt = require("jsonwebtoken");
 
 const User = require("../models/UserSchema");
 
+// for xss
+const sanitizeHtml = require("sanitize-html");
+
 const JWT_SECRET = process.env.JWT_SECRET;
 
 exports.register = async (req, res) => {
   try {
-    const { name, email, password } = req.body;
+    // sanitize
+
+    const name = sanitizeHtml(req.body.name);
+    const email = sanitizeHtml(req.body.email);
+    const password = req.body.password;
 
     const existingUser = await User.findOne({ email });
 
@@ -50,7 +57,8 @@ exports.register = async (req, res) => {
 
 exports.login = async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const email = sanitizeHtml(req.body.email);
+    const password = req.body.password;
 
     const user = await User.findOne({ email });
 
@@ -81,6 +89,7 @@ exports.login = async (req, res) => {
       message: "Login Successful",
       token,
     });
+    console.log(token);
   } catch (error) {
     console.error("Login error: ", error);
     res.status(500).json({
