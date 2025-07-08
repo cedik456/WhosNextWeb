@@ -56,6 +56,7 @@ exports.register = async (req, res) => {
 };
 
 exports.login = async (req, res) => {
+  console.log("Login route hit");
   try {
     const email = sanitizeHtml(req.body.email);
     const password = req.body.password;
@@ -88,6 +89,7 @@ exports.login = async (req, res) => {
       success: true,
       message: "Login Successful",
       token,
+      role: user.role,
     });
     console.log(token);
   } catch (error) {

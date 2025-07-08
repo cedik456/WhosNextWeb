@@ -6,14 +6,14 @@ import { useAuth } from "../contexts/AuthContext";
 import { Link, useNavigate } from "react-router-dom";
 
 const Home = () => {
-  const { user } = useAuth();
-  const navigate = useNavigate();
+  // const { user } = useAuth();
+  // const navigate = useNavigate();
 
-  useEffect(() => {
-    if (user) {
-      navigate("/swipeView");
-    }
-  }, [user]);
+  // useEffect(() => {
+  //   if (user) {
+  //     navigate("/swipeView");
+  //   }
+  // }, [user]);
 
   return (
     <div className="flex flex-col min-h-screen">

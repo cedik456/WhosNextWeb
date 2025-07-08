@@ -67,7 +67,7 @@ const CreateAccount = () => {
             <input
               type="text"
               {...register("name")}
-              className="border rounded-2xl w-full px-3 py-2 mb-1"
+              className="border rounded-lg w-full px-3 py-2 mb-1"
               placeholder="Enter your name"
             />
             <p
@@ -82,7 +82,7 @@ const CreateAccount = () => {
             <input
               type="email"
               {...register("email")}
-              className="border rounded-2xl w-full px-3 py-2 mb-1"
+              className="border rounded-lg w-full px-3 py-2 mb-1"
               placeholder="Enter your email"
             />
             <p
@@ -97,7 +97,7 @@ const CreateAccount = () => {
             <input
               {...register("password")}
               type="password"
-              className="border rounded-2xl w-full px-3 py-2 mb-1 "
+              className="border rounded-lg w-full px-3 py-2 mb-1 "
               placeholder="Enter your password"
             />
             <p
@@ -110,7 +110,7 @@ const CreateAccount = () => {
           </div>
           <button
             type="submit"
-            className={`bg-[#222222] py-2 px-4 rounded-2xl text-white w-full mb-4 cursor-pointer transition-opacity duration-300 ease-in-out`}
+            className={`bg-[#222222] py-2 px-4 rounded-lg text-white w-full mb-4 cursor-pointer transition-opacity duration-300 ease-in-out`}
           >
             Register
           </button>

@@ -5,6 +5,7 @@ import { useAuth } from "../contexts/AuthContext";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import ReCAPTCHA from "react-google-recaptcha";
 
 const loginSchema = z.object({
   email: z.string().email({ message: "Invalid email address" }),
@@ -19,6 +20,7 @@ const Nav = () => {
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [message, setMessage] = useState("");
+  const [captchaToken, setCaptchaToken] = useState(null);
 
   const {
     register,
@@ -41,15 +43,34 @@ const Nav = () => {
   };
 
   const onSubmit = async (data) => {
-    const result = await login(data.email, data.password);
+    if (!captchaToken) {
+      setMessage("Please complete the CAPTCHA");
+      return;
+    }
+
+    const result = await login(data.email, data.password, captchaToken);
 
     if (result.success) {
       setMessage("");
-      navigate("/swipeView");
+      setCaptchaToken(null);
+
+      const storedUser = JSON.parse(localStorage.getItem("user"));
+
+      if (storedUser?.role === "jobSeeker") {
+        navigate("/swipeView");
+      } else if (storedUser?.role === "recruiter") {
+        navigate("/job-posts");
+      } else if (storedUser?.role === "admin") {
+        navigate("/admin-dashboard");
+      } else {
+        navigate("/unauthorized");
+      }
+
       setIsModalOpen(false);
       reset();
     } else {
       setMessage(result.message);
+      setCaptchaToken(null);
     }
   };
 
@@ -61,8 +82,8 @@ const Nav = () => {
     <>
       <nav className="w-full bg-[#F2F2F2]">
         <div className="container flex items-center justify-between mx-auto p-8">
-          <Link className="text-3xl font-bold" to="/">
-            Who's Next
+          <Link className="text-3xl font-light" to="/">
+            Who's Next?
           </Link>
           <ul className="flex gap-6">
             <li>
@@ -87,11 +108,9 @@ const Nav = () => {
             {user ? (
               <div
                 onClick={handleLogout}
-                className="w-10 h-10 rounded-full bg-gray-300 cursor-pointer hover:opacity-80 transition-opacity duration-300 ease-in-out flex items-center justify-center"
+                className="w-10 h-10 rounded-full hover:border-red-400 border-transparent border bg-gray-300 cursor-pointer  transition duration-300 ease-in-out flex items-center justify-center"
                 title="Logout"
-              >
-                <span className="text-sm text-black font-bold">C</span>
-              </div>
+              ></div>
             ) : (
               <button
                 onClick={handleLoginClick}
@@ -124,6 +143,14 @@ const Nav = () => {
               {...register("password")}
               className="border rounded-2xl w-full px-3 py-2"
               placeholder="Enter your password"
+              autoComplete="off"
+            />
+          </div>
+          <div className="mb-4">
+            <ReCAPTCHA
+              sitekey="6LendnorAAAAAG7w5VfBGDcoX683QAMVZCao38Va"
+              onChange={(token) => setCaptchaToken(token)}
+              onExpired={() => setCaptchaToken(null)}
             />
           </div>
           <button
