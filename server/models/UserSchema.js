@@ -25,7 +25,8 @@ const UserSchema = new Schema({
   },
   role: {
     type: String,
-    enum: ["jobSeeker", "recruiter"],
+    enum: ["jobSeeker", "recruiter", "admin"],
+    default: "jobSeeker",
   },
   avatar: String,
   createdAt: {

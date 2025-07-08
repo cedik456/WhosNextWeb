@@ -1,6 +1,7 @@
 const express = require("express");
 const cors = require("cors");
 const mongoose = require("mongoose");
+const helmet = require("helmet");
 
 require("dotenv").config();
 
@@ -9,6 +10,10 @@ const PORT = process.env.PORT;
 
 app.use(cors());
 app.use(express.json());
+
+// Added helmet for strict http headers
+
+app.use(helmet());
 
 // routes
 
