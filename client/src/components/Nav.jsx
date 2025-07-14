@@ -57,11 +57,11 @@ const Nav = () => {
       const storedUser = JSON.parse(localStorage.getItem("user"));
 
       if (storedUser?.role === "jobSeeker") {
-        navigate("/swipeView");
+        navigate("/swipeView", { state: { justSignedUp: true } });
       } else if (storedUser?.role === "recruiter") {
-        navigate("/job-posts");
+        navigate("/job-posts", { state: { justSignedUp: true } });
       } else if (storedUser?.role === "admin") {
-        navigate("/admin-dashboard");
+        navigate("/admin-dashboard", { state: { justSignedUp: true } });
       } else {
         navigate("/unauthorized");
       }
@@ -80,7 +80,7 @@ const Nav = () => {
 
   return (
     <>
-      <nav className="w-full bg-[#F2F2F2]">
+      <nav className="w-full ">
         <div className="container flex items-center justify-between mx-auto p-8">
           <Link className="text-3xl font-light" to="/">
             Who's Next?
@@ -90,16 +90,14 @@ const Nav = () => {
               <Link to="/">Home</Link>
             </li>
             <li>
-              <Link to="/">Learn</Link>
+              <Link to="/swipeView">Find Matches</Link>
             </li>
             <li>
-              <Link to="/">Safety</Link>
+              <Link to="/job-posts">Find Jobs</Link>
             </li>
+
             <li>
-              <Link to="/">Support</Link>
-            </li>
-            <li>
-              <Link to="/">Download</Link>
+              <Link to="">Download</Link>
             </li>
           </ul>
           <div className="flex gap-6">

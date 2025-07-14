@@ -12,6 +12,7 @@ const { registerSchema, loginSchema } = require("../validators/authValidators");
 const loginRateLimiter = require("../middlewares/loginRateLimiter");
 const registerRateLimiter = require("../middlewares/registerRateLimiter");
 const authMiddleware = require("../middlewares/authMiddleware");
+const { encrypt, decrypt } = require("../utils/cryptoUtil");
 
 router.post(
   "/register",
@@ -23,6 +24,11 @@ router.post(
 router.post("/login", loginRateLimiter, validate(loginSchema), login);
 
 router.get("/", (req, res) => {
+  const secret = encrypt("ced@example.com");
+  console.log("Secret: ", secret);
+  const decryptedSecret = decrypt(secret);
+  console.log("Decrypted:", decryptedSecret);
+
   res.send("This is the auth ");
 });
 

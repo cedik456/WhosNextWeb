@@ -37,18 +37,24 @@ const CreateAccount = () => {
     resolver: zodResolver(registerSchema),
   });
 
-  useEffect(() => {
-    if (user) {
-      navigate("/swipeView");
-    }
-  }, [user]);
-
   const onSubmit = async (data) => {
     const result = await signup(data.name, data.email, data.password);
 
     if (result.success) {
+      const storedUser = JSON.parse(localStorage.getItem("user"));
+
+      if (storedUser?.role === "jobSeeker") {
+        navigate("/swipeView", { state: { justSignedUp: true } });
+      } else if (storedUser?.role === "recruiter") {
+        navigate("/job-posts", { state: { justSignedUp: true } });
+      } else if (storedUser?.role === "admin") {
+        navigate("/admin-dashboard", { state: { justSignedUp: true } });
+      } else {
+        navigate("/unauthorized");
+      }
+
       setMessage("");
-      navigate("/swipeView");
+
       reset();
     } else {
       setMessage(result.message);

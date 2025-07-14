@@ -6,6 +6,9 @@ const User = require("../models/UserSchema");
 // for xss
 const sanitizeHtml = require("sanitize-html");
 
+// for encryption algorithm (email for example)
+const { encrypt, decrypt } = require("../utils/cryptoUtil");
+
 const JWT_SECRET = process.env.JWT_SECRET;
 
 exports.register = async (req, res) => {
@@ -14,9 +17,13 @@ exports.register = async (req, res) => {
 
     const name = sanitizeHtml(req.body.name);
     const email = sanitizeHtml(req.body.email);
+
+    const encryptedEmail = encrypt(email);
     const password = req.body.password;
 
-    const existingUser = await User.findOne({ email });
+    // const decryptedEmail = decrypt(encryptedEmail)
+
+    const existingUser = await User.findOne({ email: encryptedEmail });
 
     if (existingUser) {
       return res.status(409).json({
@@ -29,14 +36,14 @@ exports.register = async (req, res) => {
 
     const user = new User({
       name,
-      email,
+      email: encryptedEmail,
       password: hashedPassword,
     });
 
     await user.save();
 
     const token = jwt.sign(
-      { userId: user._id, email: user.email },
+      { userId: user._id, email: decrypt(user.email) },
       JWT_SECRET,
       { expiresIn: "1h" }
     );
@@ -45,6 +52,7 @@ exports.register = async (req, res) => {
       success: true,
       message: "User registered successfully",
       token,
+      role: user.role,
     });
   } catch (error) {
     console.error("Register error: ", error);

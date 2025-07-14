@@ -6,13 +6,24 @@ import Unauthorized from "./pages/Unauthorized";
 import ProtectedRoutes from "./components/ProtectedRoutes";
 import JobPosts from "./pages/JobPosts";
 import AdminDashboard from "./pages/AdminDashboard";
+import PublicRoutes from "./components/PublicRoutes";
 
 const App = () => {
   return (
     <Routes>
       <Route path="/" element={<Home />} />
-      <Route path="/createAccount" element={<CreateAccount />} />
+
+      <Route
+        path="/createAccount"
+        element={
+          <PublicRoutes>
+            <CreateAccount />
+          </PublicRoutes>
+        }
+      />
+
       <Route path="/unauthorized" element={<Unauthorized />} />
+
       <Route
         path="/swipeView"
         element={

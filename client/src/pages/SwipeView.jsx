@@ -1,13 +1,15 @@
-import React, { useEffect } from "react";
+import { useEffect, Ima } from "react";
 import { useAuth } from "../contexts/AuthContext";
-import { Link, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import Nav from "../components/Nav";
-import Footer from "../components/Footer";
-import Avatars from "../assets/Pic.png";
+import SwipeViewImage from "../assets/SwipeView.png";
+import { useState } from "react";
 
 const SwipeView = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+  const [showModal, setShowModal] = useState(false);
 
   useEffect(() => {
     if (!user) {
@@ -15,26 +17,38 @@ const SwipeView = () => {
     }
   }, [user, navigate]);
 
+  useEffect(() => {
+    if (location.state?.justSignedUp) {
+      setShowModal(true);
+    }
+
+    navigate(location.pathname, { replace: true });
+
+    const timeout = setTimeout(() => {
+      setShowModal(false);
+    }, 2000);
+
+    return () => clearTimeout(timeout);
+  }, [location.state]);
+
   return (
-    <div className="flex flex-col min-h-screen">
+    <div>
       <Nav />
-      <main
-        className="flex-grow bg-[#F2F2F2] relative bg-cover bg-center"
-        style={{ backgroundImage: `url(${Avatars})` }}
-      >
+      <main>
         <section className="container mx-auto  ">
-          <div className="flex justify-center items-center gap-8 flex-col mt-72 relative">
-            <h1 className="font-bold text-7xl">Connect </h1>
-            <Link
-              to="/createAccount"
-              className="py-4 px-6 bg-[#222222] rounded-full text-white text-center cursor-pointer hover:opacity-80 transition-opacity duration-300 ease-in-out"
-            >
-              Create Account
-            </Link>
+          {showModal && (
+            <div className="absolute top-2 left-1/2 transform -translate-x-1/2 px-4 py-2 z-50">
+              <p className="font-medium text-center">Welcome User! 🎉</p>
+            </div>
+          )}
+          <div className="flex  justify-center mt-6">
+            <img
+              src={SwipeViewImage}
+              className="cursor-pointer w-[50%] h-[50%]"
+            />
           </div>
         </section>
       </main>
-      <Footer />
     </div>
   );
 };

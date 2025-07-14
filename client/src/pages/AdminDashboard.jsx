@@ -1,9 +1,11 @@
-import React from "react";
-
 const AdminDashboard = () => {
   return (
     <div>
-      <p>Admin dashboard</p>
+      <main>
+        <section className="container mx-auto  ">
+          <p>Admin</p>
+        </section>
+      </main>
     </div>
   );
 };
