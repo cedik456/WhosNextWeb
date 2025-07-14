@@ -43,7 +43,7 @@ exports.register = async (req, res) => {
     await user.save();
 
     const token = jwt.sign(
-      { userId: user._id, email: decrypt(user.email) },
+      { userId: user._id, email: decrypt(user.email), role: user.role },
       JWT_SECRET,
       { expiresIn: "1h" }
     );
@@ -69,7 +69,9 @@ exports.login = async (req, res) => {
     const email = sanitizeHtml(req.body.email);
     const password = req.body.password;
 
-    const user = await User.findOne({ email });
+    const encryptedEmail = encrypt(email);
+
+    const user = await User.findOne({ email: encryptedEmail });
 
     if (!user) {
       return res.status(401).json({
@@ -88,7 +90,7 @@ exports.login = async (req, res) => {
     }
 
     const token = jwt.sign(
-      { userId: user._id, email: user.email },
+      { userId: user._id, email: decrypt(user.email), role: user.role },
       JWT_SECRET,
       { expiresIn: "1h" }
     );

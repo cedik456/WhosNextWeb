@@ -19,11 +19,13 @@ app.use(helmet());
 
 const authRoutes = require("./routes/authRoutes");
 const sampleRoutes = require("./routes/sampleRoutes");
+const adminRoutes = require("./routes/adminRoutes");
 
 // route links
 
 app.use("/api/auth/", authRoutes);
 app.use("/api/sample/", sampleRoutes);
+app.use("/api/admin/", adminRoutes);
 
 // connection
 mongoose
